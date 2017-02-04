@@ -4,6 +4,8 @@ import 'rxjs/add/operator/map';
 import {Observable} from "rxjs";
 import {Joke} from "../enteties/Joke";
 import {Storage} from "@ionic/storage";
+// import { SQLite } from 'ionic-native';
+import  {Stash} from "./stash.service"
 
 /*
   Generated class for the Joke provider.
@@ -15,13 +17,14 @@ import {Storage} from "@ionic/storage";
 export class JokeService {
 
   private _restUrl: string = 'https://api.icndb.com/jokes';
+  private _stashOfStuff: Stash;
 
   constructor(public http: Http, private storage: Storage) {
     console.log('Hello Joke Provider');
+    this._stashOfStuff = new Stash();
   }
 
   getJokesRandom(numberOfJokes) {
-
     var fullUrl = `${this._restUrl}/random/${numberOfJokes}`;
     console.log("getJokesRandom() " + fullUrl);
     return this.http
@@ -39,8 +42,7 @@ export class JokeService {
   }
 
   getJoke(id: string) {
-    return this.storage.get(id).then((data) => {
-      console.log("From storage: " + data);
+    return this._stashOfStuff.get(id).then((data) => {
       if (!data) {
         return this.getJokeRest(id);
       } else {
@@ -56,8 +58,8 @@ export class JokeService {
       .get(`${this._restUrl}/${id}`, {headers: this.getHeaders()})
       .map((response: Response) => <Joke> response.json().value)
       .do(data => {
-        this.storage.set(id,data);
-        console.log(`storage set (${id}, ${data}) `);
+        this._stashOfStuff.set(id,data.joke);
+        console.log(`stash set (${id}, ${data.joke}) `);
       });
 
     return joke.toPromise();

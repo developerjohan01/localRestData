@@ -8,6 +8,7 @@ import {BuildingListPage} from "../pages/building-list-page/building-list-page";
 import {BuildingService} from "../providers/building.service";
 import {JokeService} from "../providers/joke.service";
 import {JokeListPage} from "../pages/joke-list-page/joke-list-page";
+import {Stash} from "../providers/stash.service";
 
 @NgModule({
   declarations: [
@@ -32,6 +33,6 @@ import {JokeListPage} from "../pages/joke-list-page/joke-list-page";
     BuildingService,
     JokeService,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
-    Storage]
+    Storage, Stash]
 })
 export class AppModule {}
