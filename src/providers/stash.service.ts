@@ -15,60 +15,41 @@ export class Stash {
     console.log('Hello Stash Provider');
 
     if (win.sqlitePlugin) {
-      // this._database = win.sqlitePlugin.openDatabase({
-      //   name: DB_NAME,
-      //   location: 2,
-      //   createFromLocation: 0
-      // });
-      this.setUpDatabase();
-
+      this.setUpDb();
     } else {
-      console.warn('Stash: SQLite plugin not installed, falling back to WebSQL. Make sure to install cordova-sqlite-storage in production!');
-
-      this._database = win.openDatabase(DB_NAME, '1.0', 'database', 5 * 1024 * 1024);
+      this.setUpFallBackDb();
     }
+  }
+
+  private setUpFallBackDb() {
+    console.warn('Stash: SQLite plugin not installed, falling back to WebSQL. Make sure to install cordova-sqlite-storage in production!');
+    this._database = win.openDatabase(DB_NAME, '1.0', 'database', 5 * 1024 * 1024);
     this._tryInit();
   }
 
-  // Initialize the DB with our required tables
+  // Initialize DB
   _tryInit() {
-    console.log('Trying to init the stash');
-
-    // this.query('DROP TABLE jokes')
-    //   .then( succ => {
-    //       this.query('CREATE TABLE jokes(joke_id INTEGER PRIMARY KEY,joke_text TEXT)')
-    //         .then(succ => {
-    //           console.log('Stash: CREATED tables: ', succ);
-    //         })
-    //         .catch(err => {
-    //           console.error('Stash: Unable to CREATE initial stash tables: ', err.tx, err.err);
-    //         });
-    //     }
-    //   )
-    //   .catch(err => {
-    //   console.error('Stash: Unable to DROP initial stash tables', err.tx, err.err);
-    // });
-
+    console.log('Trying to init the Stash');
     this.query('CREATE TABLE IF NOT EXISTS jokes(joke_id INTEGER PRIMARY KEY,joke_text TEXT)')
-    // this.query('CREATE TABLE jokes(joke_id INTEGER PRIMARY KEY,joke_text TEXT)')
       .then(succ => {
         console.log('Stash: CREATEed tables: ', succ);
       })
       .catch(err => {
-      console.error('Stash: Unable to CREATE initial stash tables: ', err.tx, err.err);
+        console.error('Stash: Unable to CREATE initial stash tables: ', err.tx, err.err);
     });
   }
 
-  setUpDatabase() {
+  setUpDb() {
     this._database = new SQLite();
 
     this._database.openDatabase({
       name: DB_NAME,
       location: 'default' // the location field is required
     }).then(() => {
-      console.log('jokes table opened')
+      console.log('Stash: database opened')
+      this._tryInit();
     }, (err) => {
-      console.error('Unable to open database: ', err);
+      console.error('Stash: Unable to open database: ', err);
     });
 
   }
@@ -86,7 +67,7 @@ export class Stash {
     return new Promise((resolve, reject) => {
       try {
         this._database.transaction((tx: any) => {
-            console.log('in transaction query the stash: '  + query + ' with params: ' + params);
+            console.log('Stash: in transaction query: '  + query + ' with params: ' + params);
             tx.executeSql(query, params,
               (tx: any, res: any) => resolve({ tx: tx, res: res }),
               (tx: any, err: any) => reject({ tx: tx, err: err }));
