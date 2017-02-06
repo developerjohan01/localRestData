@@ -30,7 +30,13 @@ export class JokeService {
     return this.http
       .get(`${this._restUrl}/random/${numberOfJokes}`, {headers: this.getHeaders()})
       .map((response: Response) => <Joke[]> response.json().value)
-      .do(data => console.log('All: ' +  JSON.stringify(data))) // This writes all data to the console
+      .do(data => {
+        console.log('All: ' +  JSON.stringify(data)); // This writes all data to the console
+        data.map(jokeObject => {
+          this._stashOfStuff.set(String(jokeObject.id), jokeObject.joke); // Save each fetched joke
+          console.log(jokeObject);
+        });
+      })
       .catch(this.handleError);
   }
 
