@@ -33,12 +33,29 @@ export class Stash {
   // Initialize the DB with our required tables
   _tryInit() {
     console.log('Trying to init the stash');
-    // this.query('DROP TABLE jokes').catch(err => {
+
+    // this.query('DROP TABLE jokes')
+    //   .then( succ => {
+    //       this.query('CREATE TABLE jokes(joke_id INTEGER PRIMARY KEY,joke_text TEXT)')
+    //         .then(succ => {
+    //           console.log('Stash: CREATED tables: ', succ);
+    //         })
+    //         .catch(err => {
+    //           console.error('Stash: Unable to CREATE initial stash tables: ', err.tx, err.err);
+    //         });
+    //     }
+    //   )
+    //   .catch(err => {
     //   console.error('Stash: Unable to DROP initial stash tables', err.tx, err.err);
     // });
-    this.query('CREATE TABLE IF NOT EXISTS jokes(joke_id INTEGER PRIMARY KEY,joke_text TEXT)').catch(err => {
-    // this.query('CREATE TABLE jokes(joke_id INTEGER PRIMARY KEY,joke_text TEXT)').catch(err => {
-      console.error('Stash: Unable to CREATE initial stash tables', err.tx, err.err);
+
+    this.query('CREATE TABLE IF NOT EXISTS jokes(joke_id INTEGER PRIMARY KEY,joke_text TEXT)')
+    // this.query('CREATE TABLE jokes(joke_id INTEGER PRIMARY KEY,joke_text TEXT)')
+      .then(succ => {
+        console.log('Stash: CREATEed tables: ', succ);
+      })
+      .catch(err => {
+      console.error('Stash: Unable to CREATE initial stash tables: ', err.tx, err.err);
     });
   }
 
@@ -49,7 +66,7 @@ export class Stash {
       name: DB_NAME,
       location: 'default' // the location field is required
     }).then(() => {
-      console.log('joke table opened')
+      console.log('jokes table opened')
     }, (err) => {
       console.error('Unable to open database: ', err);
     });
@@ -66,7 +83,6 @@ export class Stash {
    * @return {Promise} that resolves or rejects with an object of the form { tx: Transaction, res: Result (or err)}
    */
   query(query: string, params: any[] = []): Promise<any> {
-    console.log('query the stash: '  + query);
     return new Promise((resolve, reject) => {
       try {
         this._database.transaction((tx: any) => {

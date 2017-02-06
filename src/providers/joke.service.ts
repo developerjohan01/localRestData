@@ -31,9 +31,10 @@ export class JokeService {
       .get(`${this._restUrl}/random/${numberOfJokes}`, {headers: this.getHeaders()})
       .map((response: Response) => <Joke[]> response.json().value)
       .do(data => {
-        console.log('All: ' +  JSON.stringify(data)); // This writes all data to the console
+        //console.log('All: ' +  JSON.stringify(data)); // This writes all data to the console
         data.map(jokeObject => {
-          this._stashOfStuff.set(String(jokeObject.id), jokeObject.joke); // Save each fetched joke
+          this._stashOfStuff.set(String(jokeObject.id), jokeObject.joke) // Save each fetched joke
+            .then(result => console.log(result), error => console.log(error));
           console.log(jokeObject);
         });
       })
@@ -52,6 +53,7 @@ export class JokeService {
       if (!data) {
         return this.getJokeRest(id);
       } else {
+        console.log("Got data from Stash!");
         return data;
       }
     });
@@ -64,7 +66,8 @@ export class JokeService {
       .get(`${this._restUrl}/${id}`, {headers: this.getHeaders()})
       .map((response: Response) => <Joke> response.json().value)
       .do(data => {
-        this._stashOfStuff.set(id,data.joke);
+        this._stashOfStuff.set(id,data.joke)
+          .then(result => console.log(result), error => console.log(error));
         console.log(`stash set (${id}, ${data.joke}) `);
       });
 

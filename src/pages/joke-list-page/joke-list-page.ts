@@ -33,7 +33,7 @@ export class JokeListPage {
     console.log("Joke: " + joke.id + " : " + joke.joke);
     this._service.getJoke(joke.id.toString())
       .then(jokeData => {
-      console.log("jokeData.joke: " + jokeData.joke);
+      console.log("clicked jokeData.id: " + jokeData.id);
       this.clickedJoke = jokeData
     })
   }
